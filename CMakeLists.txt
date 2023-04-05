@@ -1,42 +1,161 @@
-cmake_minimum_required(VERSION 3.5.1)
+# root CMakeList.txt
+# the root CMakeList.txt will affect all the other CMakeList.txt configurations
+CMAKE_MINIMUM_REQUIRED(VERSION 3.8)
 
-project( fisheyeStitcher )
+project(FisheyeStitcher "CXX")
+MESSAGE(STATUS "Root Project Directory: ${PROJECT_SOURCE_DIR}")
 
-include(CheckCXXCompilerFlag) 
-CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
-if(COMPILER_SUPPORTS_CXX17)
-    # set(CMAKE_CXX_COMPILER  "/usr/bin/g++-7") # only if necessary
-    add_compile_options(-std=c++17 -O3)
-else()
-    message(FATAL_ERROR "ERROR: The compiler ${CMAKE_CXX_COMPILER} has no C++17 
-                         support. Please use a different C++ compiler.")
-endif()
+IF(!MSVC)
+	include(CheckCXXCompilerFlag) 
+	CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
+	if(COMPILER_SUPPORTS_CXX17)
+		# set(CMAKE_CXX_COMPILER  "/usr/bin/g++-7") # only if necessary
+		add_compile_options(-std=c++17 -O3)
+	else()
+		message(FATAL_ERROR "ERROR: The compiler ${CMAKE_CXX_COMPILER} has no C++17 
+							 support. Please use a different C++ compiler.")
+	endif()
+ENDIF(!MSVC)
 
-find_package( OpenCV REQUIRED )
+OPTION(DEBUG_ON "Turn on DEBUG Mode" OFF)
+OPTION(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
-include_directories( 
-    ${OpenCV_INCLUDE_DIRS} 
-    include
+SET(THIRDPARTY_INCLUDE "D:/ThirdPartyLibraries-20210530/include")
+IF(DEBUG_ON)
+	SET(THIRDPARTY_LIBRARIES "D:/ThirdPartyLibraries-20210530/x64/vc15/lib/Debug")
+ELSE()
+	SET(THIRDPARTY_LIBRARIES "D:/ThirdPartyLibraries-20210530/x64/vc15/lib/Release")
+ENDIF()
+
+IF(DEBUG_ON)
+	MESSAGE(STATUS "[Debug Mode]")
+	SET(CMAKE_BUILD_TYPE "Debug") 
+	SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
+  	SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+  	SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
+ELSE()
+	MESSAGE(STATUS "[Release Mode]")
+	SET(CMAKE_BUILD_TYPE "Release") 
+	SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
+  	SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+  	SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
+ENDIF()
+
+IF(DEBUG_ON)
+	SET(EXE_NAME FisheyeStitcher_d)
+ELSE()
+	SET(EXE_NAME FisheyeStitcher)
+ENDIF()
+
+########################################################################
+# third parties
+find_package(OpenMP REQUIRED)
+IF(OPENMP_FOUND)
+  	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+  	SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+ENDIF()
+
+SET(EIGEN3_INCLUDE_DIR ${THIRDPARTY_INCLUDE})
+#find_package(Eigen3 REQUIRED QUIET)
+IF(EIGEN3_FOUND) 
+	INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIR})
+	MESSAGE("EIGEN3 [OK]:" ${EIGEN3_INCLUDE_DIR})
+ENDIF(EIGEN3_FOUND)
+
+SET(OpenCV_INCLUDE_DIRS ${THIRDPARTY_INCLUDE})
+#find_package(OpenCV 3.0 REQUIRED QUIET)
+IF(OPENCV_FOUND) 
+	INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
+	MESSAGE("OPENCV [OK]: " ${OpenCV_INCLUDE_DIRS}) 
+	#ADD_DEFINITIONS(-DOPENCV_ON)
+ENDIF(OPENCV_FOUND)
+
+SET(PCL_INCLUDE_DIRS ${THIRDPARTY_INCLUDE})
+#find_package(PCL REQUIRED QUIET)
+IF(PCL_FOUND) 
+	INCLUDE_DIRECTORIES(${PCL_INCLUDE_DIRS})
+	ADD_DEFINITIONS(${PCL_DEFINITIONS})
+	LIST(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
+	MESSAGE("PCL [OK]:" ${PCL_INCLUDE_DIRS})
+ENDIF(PCL_FOUND)
+
+SET(CERES_INCLUDE_DIRS ${THIRDPARTY_INCLUDE})
+#find_package(Ceres REQUIRED QUIET)
+IF(Ceres_FOUND)
+	INCLUDE_DIRECTORIES(${CERES_INCLUDE_DIRS})
+	MESSAGE("CERES [OK]:" ${CERES_INCLUDE_DIRS}) 
+ENDIF(Ceres_FOUND)
+
+SET(GFLAGS_INCLUDE_DIRS ${THIRDPARTY_INCLUDE})
+#find_package(Gflags REQUIRED)
+IF(GFLAGS_FOUND)
+	INCLUDE_DIRECTORIES(${GFLAGS_INCLUDE_DIRS})
+	MESSAGE("GFLAGS [OK]:" ${GFLAGS_INCLUDE_DIRS}) 
+ENDIF(GFLAGS_FOUND)
+
+SET(GLOG_INCLUDE_DIRS ${THIRDPARTY_INCLUDE})
+#find_package(Glog REQUIRED QUIET)
+IF(GLOG_FOUND)
+	INCLUDE_DIRECTORIES(${GLOG_INCLUDE_DIRS})
+	MESSAGE("GLOG [OK]:" ${GLOG_INCLUDE_DIRS}) 
+ENDIF(GLOG_FOUND)
+
+SET(GTEST_INCLUDE_DIRS ${THIRDPARTY_INCLUDE})
+#find_package(Gtest REQUIRED QUIET)
+IF(GTEST_FOUND)
+	INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
+	MESSAGE("GTEST [OK]:" ${GTEST_INCLUDE_DIRS}) 
+ENDIF(GTEST_FOUND)
+
+########################################################################
+# include folder
+# third party library include directory for whole sln
+INCLUDE_DIRECTORIES(
+	${THIRDPARTY_INCLUDE}
+	${PROJECT_SOURCE_DIR}/include
 )
+# library base path
+LINK_DIRECTORIES(${THIRDPARTY_LIBRARIES})
 
-add_definitions( 
-    # -DMY_DEBUG      # Print debug info and dump intermediate images 
-    # -DPROFILING     # Profiling performance function-wise
-    # -DGEAR360_C200  # Setting for GEAR 360 C200 camera 
+########################################################################
+# include folder
+FILE(GLOB_RECURSE HEADER_FILES 
+	${PROJECT_SOURCE_DIR}/include/*.hpp
+	${PROJECT_SOURCE_DIR}/include/*.h
 )
-add_library( stitcher SHARED
+SOURCE_GROUP("Header Files" FILES ${HEADER_FILES})
+
+########################################################################
+# extern shared library e.g. FisheyeStitcher.lib
+ADD_LIBRARY(${EXE_NAME}
+	${HEADER_FILES}
     src/fisheye_stitcher.cpp
 )
 
-add_executable( fisheyeStitcher 
-    app/stitch.cpp
+TARGET_LINK_LIBRARIES(${EXE_NAME} 
+    opencv_core347
+	opencv_calib3d347
+	opencv_highgui347
+	opencv_imgproc347
 )
 
-target_link_libraries( fisheyeStitcher 
-    stitcher
-    ${OpenCV_LIBS} 
-)
-set_target_properties( fisheyeStitcher
-    PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-)
+########################################################################
+# C++ PREPROCESSOR DEFINITIONS, carefully note the -D PREFIX
+IF(MSVC)
+	TARGET_COMPILE_OPTIONS(${EXE_NAME} PUBLIC "-D_USE_MATH_DEFINES")
+	TARGET_COMPILE_OPTIONS(${EXE_NAME} PUBLIC "-DFISHEYE_STITCHER_USE_AS_DLL")
+	TARGET_COMPILE_OPTIONS(${EXE_NAME} PUBLIC "-DFISHEYE_STITCHER_EXPORT")
+ENDIF(MSVC)
+
+IF(DEBUG_ON)
+	ADD_CUSTOM_COMMAND(
+		TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND XCOPY "./msvc/lib/Debug/${PROJECT_NAME}.dll" "../../../install/Debug"
+	)
+ELSE()
+	ADD_CUSTOM_COMMAND(
+		TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND XCOPY ${LIBRARY_OUTPUT_PATH}/${PROJECT_NAME}.dll ../../../install/Release /E /D /R /Y
+	)
+ENDIF()

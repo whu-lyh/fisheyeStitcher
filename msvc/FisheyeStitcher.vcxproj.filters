@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\codefiles\NewVS\PointImageFusion\submodules\fisheyeStitcher\src\fisheye_stitcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\codefiles\NewVS\PointImageFusion\submodules\fisheyeStitcher\include\DllExportsMacro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\codefiles\NewVS\PointImageFusion\submodules\fisheyeStitcher\include\fisheye_stitcher.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\codefiles\NewVS\PointImageFusion\submodules\fisheyeStitcher\include\input_parser.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\codefiles\NewVS\PointImageFusion\submodules\fisheyeStitcher\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{9FFAEF95-0A60-35E3-86FF-45A8D017821D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{B540C2C5-7F71-397D-9028-0581D99BC5D9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

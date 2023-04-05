@@ -24,8 +24,11 @@ The code is built and tested in Ubuntu 16.04 and Ubuntu 18.04.
 if(COMPILER_SUPPORTS_CXX17)
     set(CMAKE_CXX_COMPILER  "/usr/bin/g++-7")  # only if necessary (Ubuntu 16.04 or older)
 ```
+* 如果是VS2017，需要手动打开c++17的支持，但是似乎vs2017不支持std::variant。暂时不知道如何通过cmake来打开c++17。而且VS2017无法使用，就暂时关掉了。反正vs上也不用命令解析的部分。
 * CMake 3.5.1.
 * OpenCV 3.4.2 (with calib3d) or more recent version of OpenCV.
+* ffmepg is required. video load failed: "error: (-5:Bad argument) Error opening video"
+* 此外在使用时需要根据需要构建特定分辨率的对应映射关系，[其中用到了matlab](https://github.com/drNoob13/fisheyeStitcher/wiki/How-to-create-the-MLS-%5BX,Y%5D-grids)，想要大批量，显然是不合适的。因此不可以使用这种方法。况且，我测试代码都没通过。放弃。转ffmepg。
 
 ### Build
 
@@ -44,7 +47,7 @@ if(COMPILER_SUPPORTS_CXX17)
     ```
     cd scripts
     ./RUN_fisheye.sh
-
+    
     ```
 
 Please be informed that the code doesn't include the temporal coherence control, but one can implement it using the description in [1].

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="E:\codefiles\NewVS\PointImageFusion\submodules\fisheyeStitcher\msvc\CMakeFiles\c642f5e1e360edc5bbaa2e6486c32353\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{A8D410AF-2EB0-330E-A7B2-931D032D0D5D}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
